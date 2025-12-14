@@ -1,75 +1,77 @@
--- ⚠️ CHỈ DÙNG CHO HỌC TẬP / TEST
--- AUTO FARM BLOX FRUITS (BASIC – BẢN LÚC ĐẦU)
+-- SIMPLE BLOX FRUITS HUB + KEY SYSTEM -- học tập / test
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
-local VirtualUser = game:GetService("VirtualUser")
+local Players = game:GetService("Players") local TweenService = game:GetService("TweenService") local RunService = game:GetService("RunService") local player = Players.LocalPlayer
 
-local player = Players.LocalPlayer
+-- ===== KEY SYSTEM ===== local VALID_KEYS = { "VU-ADMIN-999", "VU-USER-123" }
 
--- CÀI ĐẶT
-getgenv().AutoFarm = true
-getgenv().FarmDistance = 6
-getgenv().TweenSpeed = 200
+local function CheckKey() local input = ""
 
--- LẤY NHÂN VẬT
-local function getChar()
-    return player.Character or player.CharacterAdded:Wait()
-end
+local gui = Instance.new("ScreenGui", player.PlayerGui)
+gui.Name = "KeyUI"
 
-local function getHRP()
-    return getChar():WaitForChild("HumanoidRootPart")
-end
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0,300,0,160)
+frame.Position = UDim2.new(0.5,-150,0.4,0)
+frame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+frame.Active = true
+frame.Draggable = true
 
--- DI CHUYỂN
-local function tweenTo(cf)
-    local hrp = getHRP()
-    local dist = (hrp.Position - cf.Position).Magnitude
-    local time = dist / getgenv().TweenSpeed
-    local tween = TweenService:Create(
-        hrp,
-        TweenInfo.new(time, Enum.EasingStyle.Linear),
-        {CFrame = cf}
-    )
-    tween:Play()
-    tween.Completed:Wait()
-end
+local box = Instance.new("TextBox", frame)
+box.Size = UDim2.new(1,-20,0,40)
+box.Position = UDim2.new(0,10,0,20)
+box.PlaceholderText = "Nhập KEY"
+box.Text = ""
+box.TextColor3 = Color3.new(1,1,1)
+box.BackgroundColor3 = Color3.fromRGB(50,50,50)
 
--- TÌM MOB GẦN NHẤT
-local function getNearestMob()
-    local nearest, minDist = nil, math.huge
-    for _, mob in pairs(workspace.Enemies:GetChildren()) do
-        if mob:FindFirstChild("Humanoid")
-        and mob.Humanoid.Health > 0
-        and mob:FindFirstChild("HumanoidRootPart") then
-            local d = (mob.HumanoidRootPart.Position - getHRP().Position).Magnitude
-            if d < minDist then
-                minDist = d
-                nearest = mob
-            end
+local btn = Instance.new("TextButton", frame)
+btn.Size = UDim2.new(1,-20,0,40)
+btn.Position = UDim2.new(0,10,0,80)
+btn.Text = "XÁC NHẬN"
+btn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+btn.TextColor3 = Color3.new(1,1,1)
+
+local passed = false
+
+btn.MouseButton1Click:Connect(function()
+    for _,k in pairs(VALID_KEYS) do
+        if box.Text == k then
+            passed = true
+            gui:Destroy()
+            break
         end
     end
-    return nearest
-end
-
--- ĐÁNH
-local function attack()
-    VirtualUser:Button1Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-    task.wait(0.1)
-    VirtualUser:Button1Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-end
-
--- VÒNG LẶP FARM
-RunService.RenderStepped:Connect(function()
-    if not getgenv().AutoFarm then return end
-    pcall(function()
-        local mob = getNearestMob()
-        if mob then
-            tweenTo(mob.HumanoidRootPart.CFrame * CFrame.new(0,0,getgenv().FarmDistance))
-            attack()
-        end
-    end)
+    if not passed then
+        box.Text = "KEY SAI"
+    end
 end)
 
-print("Auto Farm Loaded")
+repeat task.wait() until passed
+
+end
+
+CheckKey()
+
+-- ===== SETTINGS ===== getgenv().AutoFarm = false getgenv().AutoBoss = false getgenv().FarmDistance = 6 getgenv().TweenSpeed = 250
+
+-- ===== BASIC FUNCS ===== local function Char() return player.Character or player.CharacterAdded:Wait() end
+
+local function HRP() return Char():WaitForChild("HumanoidRootPart") end
+
+local function TweenTo(cf) local hrp = HRP() local t = (hrp.Position - cf.Position).Magnitude / getgenv().TweenSpeed TweenService:Create(hrp, TweenInfo.new(t, Enum.EasingStyle.Linear), {CFrame = cf}):Play() end
+
+local function Click() local vu = game:GetService("VirtualUser") vu:Button1Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame) task.wait(0.1) vu:Button1Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame) end
+
+local function GetMob() for _,v in pairs(workspace.Enemies:GetChildren()) do if v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then return v end end end
+
+-- ===== AUTO FARM ===== RunService.RenderStepped:Connect(function() if not getgenv().AutoFarm then return end pcall(function() local mob = GetMob() if mob and mob:FindFirstChild("HumanoidRootPart") then TweenTo(mob.HumanoidRootPart.CFrame * CFrame.new(0,0,getgenv().FarmDistance)) Click() end end) end)
+
+-- ===== AUTO BOSS ===== spawn(function() while task.wait(1) do if getgenv().AutoBoss then for _,v in pairs(workspace.Enemies:GetChildren()) do if string.find(v.Name:lower(),"boss") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then repeat TweenTo(v.HumanoidRootPart.CFrame * CFrame.new(0,0,6)) Click() task.wait() until v.Humanoid.Health <= 0 or not getgenv().AutoBoss end end end end end)
+
+-- ===== MENU ===== local gui = Instance.new("ScreenGui", player.PlayerGui) local frame = Instance.new("Frame", gui) frame.Size = UDim2.new(0,240,0,180) frame.Position = UDim2.new(0,20,0.35,0) frame.BackgroundColor3 = Color3.fromRGB(25,25,25) frame.Active = true frame.Draggable = true
+
+action = function(text,y,func) local b = Instance.new("TextButton", frame) b.Size = UDim2.new(1,-20,0,35) b.Position = UDim2.new(0,10,0,y) b.Text = text b.BackgroundColor3 = Color3.fromRGB(60,60,60) b.TextColor3 = Color3.new(1,1,1) b.MouseButton1Click:Connect(func) end
+
+action("AUTO FARM",20,function() getgenv().AutoFarm = not getgenv().AutoFarm end) action("AUTO BOSS",65,function() getgenv().AutoBoss = not getgenv().AutoBoss end) action("CLOSE",110,function() gui:Destroy() end)
+
+print("✅ HUB + KEY LOADED")
