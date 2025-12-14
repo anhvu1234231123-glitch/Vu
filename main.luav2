@@ -1,3 +1,4 @@
+warn("SCRIPT DA LOAD OK")
 -- SIMPLE BLOX FRUITS HUB + KEY SYSTEM -- học tập / test
 
 local Players = game:GetService("Players") local TweenService = game:GetService("TweenService") local RunService = game:GetService("RunService") local player = Players.LocalPlayer
