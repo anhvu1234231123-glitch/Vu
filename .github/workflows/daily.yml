@@ -1,0 +1,18 @@
+name: key
+
+on:
+  schedule:
+    - cron: '0 17 * * *'
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo $RANDOM$RANDOM > key.txt
+      - run: |
+          git config user.name bot
+          git config user.email bot@bot.com
+          git add key.txt
+          git commit -m update
+          git push
