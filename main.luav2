@@ -1,1 +1,30 @@
-print("TEST EXECUTOR")
+-- SAFE TEST HUB
+warn("SCRIPT BAT DAU")
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- đợi game load xong
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+
+warn("GAME DA LOAD")
+
+-- TEST UI
+local gui = Instance.new("ScreenGui")
+gui.Name = "TestUI"
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0,200,0,120)
+frame.Position = UDim2.new(0.5,-100,0.5,-60)
+frame.BackgroundColor3 = Color3.fromRGB(40,40,40)
+
+local txt = Instance.new("TextLabel", frame)
+txt.Size = UDim2.new(1,0,1,0)
+txt.Text = "SCRIPT CHAY OK"
+txt.TextColor3 = Color3.new(1,1,1)
+txt.BackgroundTransparency = 1
+
+warn("UI DA HIEN")
